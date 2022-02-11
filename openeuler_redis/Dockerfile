@@ -22,6 +22,5 @@ ENV PATH=$PATH:/usr/local/redis/bin
 COPY main.sh /opt/main.sh
 RUN chmod +x /opt/main.sh
 
-EXPOSE 3306
 ENTRYPOINT [ "/opt/main.sh"]
 CMD ["/bin/bash"]

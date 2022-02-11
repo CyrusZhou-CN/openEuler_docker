@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ -n "$BIND" ]; then
+        sed -i "s/bind 127.0.0.1.*/bind $BIND/g" /usr/local/redis/bin/redis.conf
+fi
+sed -i 's/daemonize no/daemonize yes/g' /usr/local/redis/bin/redis.conf
 
 /usr/local/redis/bin/redis-server /usr/local/redis/bin/redis.conf
 redis-server -v
