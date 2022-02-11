@@ -14,15 +14,21 @@ RUN yum install -y passwd initscripts sudo
 # 编译安装 Python
 RUN tar -xvf /tmp/Python-*.tar.xz -C /opt/ && rm -rf /tmp/Python-*.tar.xz && \
     cd /opt/Python-* && \
-    ./configure -prefix=/usr/local/python3.9 --with-ssl --enable-optimizations --enable-shared && \
+    ./configure -prefix=/usr \
+    --enable-optimizations \
+    --with-platlibdir=lib64 && \
     make -j8 && make install 
-RUN /usr/bin/cp /usr/local/python3.9/lib/lib* /usr/lib64
-RUN /usr/bin/cp /usr/local/python3.9/lib/lib* /usr/lib
-RUN ln -sf /usr/local/python3.9/bin/python3.9 /usr/bin/python39 \
-    && ln -sf /usr/local/python3.9/bin/python3.9 /usr/bin/python3.9 \
-    && ln -sf /usr/local/python3.9/bin/pip3 /usr/bin/pip3.9 \
-    && ln -sf /usr/local/python3.9/bin/pip3 /usr/bin/pip39
-RUN /usr/bin/python39 -m pip install --upgrade pip
+
+RUN cp -rf /usr/lib/python3.8/site-packages/dnf-plugins /usr/lib/python3.9/site-packages/dnf-plugins && \
+    cp -rf /usr/lib/python3.8/site-packages/dnf /usr/lib/python3.9/site-packages/dnf && \    
+    cp -rf /usr/lib64/python3.8/site-packages/libdnf /usr/lib64/python3.9/site-packages/libdnf && \
+    cp -rf /usr/lib64/python3.8/site-packages/rpm /usr/lib64/python3.9/site-packages/rpm && \
+    cp -rf /usr/lib64/python3.8/site-packages/libcomps /usr/lib64/python3.9/site-packages/libcomps && \
+    cp -rf /usr/lib64/python3.8/site-packages/gpg /usr/lib64/python3.9/site-packages/gpg && \
+    cp -rf /usr/lib64/python3.8/site-packages/hawkey /usr/lib64/python3.9/site-packages/hawkey && \
+    mv /usr/lib64/python3.9/site-packages/gpg/_gpgme.cpython-38-x86_64-linux-gnu.so /usr/lib64/python3.9/site-packages/gpg/_gpgme.cpython-39-x86_64-linux-gnu.so
+
+RUN /usr/bin/python3 -m pip install --upgrade pip
 RUN rpm -ivh /tmp/compat-openssl10*.rpm
 RUN yum clean all
 # 清除安装包

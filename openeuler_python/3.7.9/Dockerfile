@@ -34,7 +34,7 @@ RUN cp -rf /usr/lib/python3.7/site-packages/dnf-plugins /usr/local/python3.7/lib
     cp -rf /usr/lib/python3.7/site-packages/fros-1.1-py3.7.egg-info /usr/local/python3.7/lib/python3.7/site-packages/fros-1.1-py3.7.egg-info && \
     cp -rf /usr/lib/python3.7/site-packages/pyfros /usr/local/python3.7/lib/python3.7/site-packages/pyfros && \
     cp -rf /usr/lib/python3.7/site-packages/pyparsing-2.4.7.dist-info /usr/local/python3.7/lib/python3.7/site-packages/pyparsing-2.4.7.dist-info && \
-    cp -rf /usr/lib/python3.7/site-packages/dnf /usr/local/python3.7/lib/python3.7/site-packages/dnf && \
+    cp -rf /usr/lib/python3.7/site-packages/dnf /usr/local/python3.7/lib/python3.7/site-packages/dnf && \    
     cp -rf /usr/lib64/python3.7/site-packages/libdnf /usr/local/python3.7/lib/python3.7/site-packages/libdnf && \
     cp -rf /usr/lib64/python3.7/site-packages/rpm /usr/local/python3.7/lib/python3.7/site-packages/rpm && \
     cp -rf /usr/lib64/python3.7/site-packages/rpm-4.15.1-py3.7.egg-info  /usr/local/python3.7/lib/python3.7/site-packages/rpm-4.15.1-py3.7.egg-info && \
