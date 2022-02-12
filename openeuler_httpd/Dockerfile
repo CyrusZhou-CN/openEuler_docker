@@ -1,4 +1,4 @@
-FROM openeuler/openeuler:20.03 AS base
+FROM openeuler/openeuler:20.09 AS base
 
 EXPOSE 80
 
@@ -8,11 +8,11 @@ RUN yum update -y
 
 FROM base AS builder
 COPY ./httpd-2.4.51.tar.bz2 httpd-2.4.51.tar.bz2
-RUN yum install -y wget apr-devel apr-util-devel pcre-devel gcc make tar gcc-c++ lua-devel \
-    pcre openssl openssl-devel zlib unzip cmake ncurses-devel expat-devel libjpeg openldap-devel \
+RUN yum install -y wget apr-devel apr-util-devel pcre pcre-devel gcc make tar gcc-c++ lua-devel \
+    openssl openssl-devel zlib unzip cmake ncurses-devel expat-devel libjpeg openldap-devel \
     libjpeg-devel libpng libxml2 libxml2-devel curl-devel libtool libtool-ltdl libtool-ltdl-devel \
     libevent libevent-devel zlib-static zlib-devel autoconf gd perl freetype freetype-devel \
-    doxygen libuuid-devel python rpm-build libdb-devel mysql5-devel nss-devel postgresql-devel sqlite-devel unixODBC-devel
+    doxygen libuuid-devel python rpm-build libdb-devel mysql-devel nss-devel postgresql-devel sqlite-devel unixODBC-devel
 RUN yum clean all
 
 RUN rpmbuild -tb httpd-2.4.51.tar.bz2

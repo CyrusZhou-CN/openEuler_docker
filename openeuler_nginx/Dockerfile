@@ -1,4 +1,4 @@
-FROM openeuler/openeuler:20.03 AS base
+FROM openeuler/openeuler:20.09 AS base
 
 EXPOSE 80
 WORKDIR /opt
