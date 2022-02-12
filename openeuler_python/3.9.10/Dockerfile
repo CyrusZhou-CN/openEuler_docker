@@ -11,13 +11,22 @@ RUN yum -y update && yum -y install shadow-utils tar libaio-devel flex bison \
 # bash: service: command not found
 RUN yum install -y passwd initscripts sudo
 
-# 编译安装 Python
+# 编译安装 Python 修复 libpython3.9.so.1.0()(64bit) 问题
 RUN tar -xvf /tmp/Python-*.tar.xz -C /opt/ && rm -rf /tmp/Python-*.tar.xz && \
     cd /opt/Python-* && \
     ./configure -prefix=/usr \
-    --enable-optimizations \
+    --enable-optimizations --with-lto \
+    --with-threads \
+    --enable-shared \
+    --enable-universalsdk \
     --with-platlibdir=lib64 && \
-    make -j8 && make install 
+    make -j8 && make install
+
+RUN cp /lib/libpython3.9.so /lib/libpython3.so && \
+    cp /lib/libpython3.9.so /lib64/libpython3.so && \
+    cp /lib/libpython3.9.so /lib64/libpython3.9.so && \
+    ln -sf /lib/libpython3.9.so /lib64/libpython3.9.so.1.0 && \
+    ldconfig
 
 RUN cp -rf /usr/lib/python3.8/site-packages/dnf-plugins /usr/lib/python3.9/site-packages/dnf-plugins && \
     cp -rf /usr/lib/python3.8/site-packages/dnf /usr/lib/python3.9/site-packages/dnf && \    
@@ -34,5 +43,5 @@ RUN yum clean all
 # 清除安装包
 RUN rm -rf /tmp/* /opt/*
 
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/python3.9/lib
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 CMD ["/bin/bash"]
