@@ -10,15 +10,15 @@ FROM base AS builder
 RUN yum -y install wget tar make gcc autoconf systemd-devel openjpeg-devel gcc-c++ \
         pcre-devel zlib-devel libxml2 libxml2-devel openssl openssl-devel bzip2 bzip2-devel \
         libcurl libcurl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel \
-        gmp gmp-devel readline readline-devel libxslt libxslt-devel
+        gmp gmp-devel readline readline-devel libxslt libxslt-devel sqlite-devel
 
 RUN wget https://nginx.org/download/nginx-1.21.6.tar.gz
-RUN wget https://www.php.net/distributions/php-5.6.6.tar.gz
+RUN wget https://www.php.net/distributions/php-7.4.28.tar.gz
 RUN wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz
 RUN wget https://sourceforge.net/projects/mcrypt/files/Libmcrypt/2.5.8/libmcrypt-2.5.8.tar.gz
 RUN wget https://sourceforge.net/projects/mhash/files/latest/download/mhash-0.9.9.9.tar.gz
 RUN tar -zvxf nginx-1.21.6.tar.gz
-RUN tar -zvxf php-5.6.6.tar.gz
+RUN tar -zvxf php-7.4.28.tar.gz
 RUN tar -zvxf libiconv-1.16.tar.gz
 RUN tar zxvf libmcrypt-2.5.8.tar.gz
 RUN tar -zxvf mhash-0.9.9.9.tar.gz
@@ -26,17 +26,13 @@ RUN tar -zxvf mhash-0.9.9.9.tar.gz
 RUN cd nginx-1.21.6 && ./configure --prefix=/usr/local/nginx  && make && make install
 RUN rm -Rf nginx-1.21.6 nginx-1.21.6.tar.gz
 
-COPY  ./php/zend-loader-php5.6-linux-x86_64_update1.tar.gz zend-loader-php5.6-linux-x86_64_update1.tar.gz
-RUN tar -zxvf zend-loader-php5.6-linux-x86_64_update1.tar.gz
-RUN mkdir -p /usr/local/zend/ && cp zend-loader-php5.6-linux-x86_64/*.so /usr/local/zend/
-
 RUN cd libiconv-1.16 && ./configure --prefix=/usr/local/libiconv && make -j 2&& make install
 
 RUN cd libmcrypt-2.5.8 && ./configure && make && make install && ldconfig && cd libltdl/ && ./configure --enable-ltdl-install && make && make install
 
 RUN cd mhash-0.9.9.9 && ./configure && make -j 2 && make install
 
-RUN cd php-5.6.6 &&  ./configure --prefix=/usr/local/php \
+RUN cd php-7.4.28 &&  ./configure --prefix=/usr/local/php \
         --with-config-file-path=/usr/local/php/etc \
         --enable-fpm \
         --enable-gd-native-ttf \
@@ -54,7 +50,7 @@ RUN cd php-5.6.6 &&  ./configure --prefix=/usr/local/php \
         --with-gd && make -j 2 ZEND_EXTRA_LIBS='-liconv' && make install
 
 RUN  set -e;\
-        cd php-5.6.6 &&cp php.ini-production /usr/local/php/etc/php.ini;\
+        cd php-7.4.28 &&cp php.ini-production /usr/local/php/etc/php.ini;\
         sed -i 's/post_max_size = 8M/post_max_size = 50M/g' /usr/local/php/etc/php.ini;\
         sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 50M/g' /usr/local/php/etc/php.ini;\
         sed -i 's/;date.timezone =/date.timezone = PRC/g' /usr/local/php/etc/php.ini;\
@@ -82,7 +78,7 @@ FROM base AS runtime
 RUN yum -y install shadow-utils && groupadd -r www && useradd -r -g www www
 COPY  --from=builder /usr/local/nginx   /usr/local/nginx
 COPY  --from=builder /usr/local/php  /usr/local/php
-COPY  --from=builder /usr/local/zend /usr/local/zend
+# COPY  --from=builder /usr/local/zend /usr/local/zend
 COPY  --from=builder /usr/local/libiconv /usr/local/libiconv
 COPY  ./php/php-fpm.conf  /usr/local/php/etc/php-fpm.conf
 RUN     ln -s /usr/local/php/bin/php /usr/bin/php;\

@@ -41,7 +41,7 @@ RUN /usr/bin/python3 -m pip install --upgrade pip
 RUN rpm -ivh /tmp/compat-openssl10*.rpm
 RUN yum clean all
 # 清除安装包
-RUN rm -rf /tmp/* /opt/*
+#RUN rm -rf /tmp/* /opt/*
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 CMD ["/bin/bash"]
