@@ -34,7 +34,8 @@ RUN  sed -i "/^psycopg2==2.8.*/c\psycopg2-binary==2.9.\*" /opt/pgadmin4-6.0/requ
 RUN /usr/bin/python3 -m venv /opt/pgadmin4-6.0/venv && \
     source /opt/pgadmin4-6.0/venv/bin/activate && \ 
     /opt/pgadmin4-6.0/venv/bin/python3 -m pip install --upgrade pip  && \ 
-    pip install -r /opt/pgadmin4-6.0/requirements.txt --use-feature=2020-resolver
+    pip install -r /opt/pgadmin4-6.0/requirements.txt --use-feature=2020-resolver && \
+    pip install markupsafe==2.0.1
 
 COPY ./pgAdmin4.conf /etc/httpd/conf/extra/pgAdmin4.conf
 
