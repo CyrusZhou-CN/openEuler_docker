@@ -7,40 +7,39 @@ RUN yum install -y python3-pip python3-devel
 
 FROM base AS builder
 
-COPY ./pgadmin4-6.0.tar.gz pgadmin4-6.0.tar.gz
+COPY ./pgadmin4-*.tar.gz pgadmin4-*.tar.gz
 COPY ./mod_wsgi-4.9.0.tar.gz mod_wsgi-4.9.0.tar.gz 
-RUN tar vfx pgadmin4-6.0.tar.gz
+RUN tar vfx pgadmin4-*.tar.gz && rm -Rf pgadmin4-*.tar.gz && mv pgadmin4-* pgadmin4
 RUN yum install -y make
 RUN  echo -e "LOG_FILE = '/var/log/pgadmin4/pgadmin4.log'\n\
 SQLITE_PATH = '/var/lib/pgadmin4/pgadmin4.db'\n\
 SESSION_DB_PATH = '/var/lib/pgadmin4/sessions'\n\
 STORAGE_DIR = '/var/lib/pgadmin4/storage'\n\
-SERVER_MODE = True" > /opt/pgadmin4-6.0/web/config_local.py
+SERVER_MODE = True" > /opt/pgadmin4/web/config_local.py
 
 RUN tar xvfz mod_wsgi-4.9.0.tar.gz && \
+    rm -Rf mod_wsgi-4.9.0.tar.gz && \
     cd mod_wsgi-4.9.0 && ./configure --with-python=/usr/bin/python3.8 && \
     make -j4 && make install
 
 FROM base AS runtime
 COPY --from=builder /usr/lib64/httpd /usr/lib64/httpd
-COPY --from=builder /opt/pgadmin4-6.0 /opt/pgadmin4-6.0
+COPY --from=builder /opt/pgadmin4 /opt/pgadmin4
 COPY --from=builder /usr/bin/python3.8 /usr/bin/python3.8
-RUN yum -y install krb5-devel
+RUN yum -y install krb5-devel postgresql-devel*
 RUN echo "LoadModule wsgi_module /usr/lib64/httpd/modules/mod_wsgi.so" >> /etc/httpd/conf/httpd.conf
 RUN echo "Include /etc/httpd/conf/extra/pgAdmin4.conf" >> /etc/httpd/conf/httpd.conf
-RUN sed -i "4 i<a href='/pgadmin4'>pgAdmin4 6.0</a>" /var/www/html/index.html
+RUN sed -i "4 i<a href='/pgadmin4'>pgAdmin4</a>" /var/www/html/index.html
 
-RUN  sed -i "/^psycopg2==2.8.*/c\psycopg2-binary==2.9.\*" /opt/pgadmin4-6.0/requirements.txt
-RUN /usr/bin/python3 -m venv /opt/pgadmin4-6.0/venv && \
-    source /opt/pgadmin4-6.0/venv/bin/activate && \ 
-    /opt/pgadmin4-6.0/venv/bin/python3 -m pip install --upgrade pip  && \ 
-    pip install -r /opt/pgadmin4-6.0/requirements.txt --use-feature=2020-resolver && \
-    pip install markupsafe==2.0.1
+RUN /usr/bin/python3 -m venv /opt/pgadmin4/venv && \
+    source /opt/pgadmin4/venv/bin/activate && \ 
+    /opt/pgadmin4/venv/bin/python3 -m pip install --upgrade pip  && \ 
+    pip install -r /opt/pgadmin4/requirements.txt
 
 COPY ./pgAdmin4.conf /etc/httpd/conf/extra/pgAdmin4.conf
 
 COPY ./main.sh main.sh
-RUN chown -R www:www /opt/pgadmin4-6.0
+RUN chown -R www:www /opt/pgadmin4
 RUN yum clean all
 
 ENV PGADMIN_DEFAULT_EMAIL="admin@domain.com"

@@ -13,10 +13,10 @@ if [ ! -f /var/lib/pgadmin4/pgadmin4.db ]; then
 
         # Set the default username and password in a
         # backwards compatible way
-        source /opt/pgadmin4-6.0/venv/bin/activate
+        source /opt/pgadmin4/venv/bin/activate
         export PGADMIN_SETUP_EMAIL=${PGADMIN_DEFAULT_EMAIL}
         export PGADMIN_SETUP_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
-        python3 /opt/pgadmin4-6.0/web/setup.py
+        python3 /opt/pgadmin4/web/setup.py
         chown -R www:www /var/log/pgadmin4
         chown -R www:www /var/lib/pgadmin4
         sleep 5
@@ -25,7 +25,7 @@ fi
 
 service httpd  start
 httpd -v
-echo -e "\033[32m ==> pgAdmin4 6.0\033[0m"
+echo -e "\033[32m ==> pgAdmin4 \033[0m"
 echo -e "\033[32m ==> START SUCCESSFUL ... \033[0m"
 waitterm() {
         local PID
