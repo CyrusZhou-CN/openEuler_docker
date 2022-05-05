@@ -14,3 +14,4 @@ RUN wget https://download.visualstudio.microsoft.com/download/pr/9d8c7137-2091-4
 
 RUN tar vfx "${DOTNET_SDK}" -C "${DOTNET_ROOT}"
 RUN rm -Rf "${DOTNET_SDK}"
+RUN  yum -y install iputils
