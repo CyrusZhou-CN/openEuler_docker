@@ -1,4 +1,4 @@
-FROM openeuler/openeuler:20.09  AS base
+FROM openeuler/openeuler:22.09  AS base
 
 WORKDIR /opt
 
@@ -7,12 +7,12 @@ RUN yum update -y
 FROM base AS builder
 RUN yum -y install wget tar 
 
-RUN wget https://archive.mariadb.org/mariadb-10.7.1/source/mariadb-10.7.1.tar.gz
-RUN tar -zvxf mariadb-10.7.1.tar.gz
+RUN wget https://archive.mariadb.org/mariadb-10.9.3/source/mariadb-10.9.3.tar.gz
+RUN tar -zvxf mariadb-10.9.3.tar.gz
 
 RUN yum -y install cmake make gcc gcc-c++ ncurses-devel openssl-devel openssl libevent 
 RUN mkdir -p /var/lib/mysql
-RUN cd mariadb-10.7.1 && \
+RUN cd mariadb-10.9.3 && \
 	cmake . -DDEFAULT_CHARSET=utf8 \
 	-DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
 	-DMYSQL_DATADIR=/var/lib/mysql \
@@ -61,4 +61,4 @@ COPY docker-entrypoint.sh /usr/local/bin/
 COPY ./main.sh /opt/main.sh
 ENTRYPOINT ["/opt/main.sh"]
 EXPOSE 3306
-CMD ["/opt/main.sh"]
+CMD ["/bin/bash"]

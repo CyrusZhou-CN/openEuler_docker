@@ -1,1 +1,1 @@
-docker build -t lsqtzj/openeuler_mariadb .
+docker build -t lsqtzj/openeuler_mariadb:latest .
