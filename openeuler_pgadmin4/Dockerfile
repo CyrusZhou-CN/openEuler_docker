@@ -1,4 +1,4 @@
-FROM lsqtzj/openeuler_httpd:v2.4.51  AS base
+FROM lsqtzj/openeuler_httpd:v2.4.56  AS base
 
 EXPOSE 80
 WORKDIR /opt
@@ -19,13 +19,13 @@ SERVER_MODE = True" > /opt/pgadmin4/web/config_local.py
 
 RUN tar xvfz mod_wsgi-4.9.0.tar.gz && \
     rm -Rf mod_wsgi-4.9.0.tar.gz && \
-    cd mod_wsgi-4.9.0 && ./configure --with-python=/usr/bin/python3.8 && \
+    cd mod_wsgi-4.9.0 && ./configure --with-python=/usr/bin/python3.10 && \
     make -j4 && make install
 
 FROM base AS runtime
 COPY --from=builder /usr/lib64/httpd /usr/lib64/httpd
 COPY --from=builder /opt/pgadmin4 /opt/pgadmin4
-COPY --from=builder /usr/bin/python3.8 /usr/bin/python3.8
+COPY --from=builder /usr/bin/python3.10 /usr/bin/python3.10
 RUN yum -y install krb5-devel postgresql-devel*
 RUN echo "LoadModule wsgi_module /usr/lib64/httpd/modules/mod_wsgi.so" >> /etc/httpd/conf/httpd.conf
 RUN echo "Include /etc/httpd/conf/extra/pgAdmin4.conf" >> /etc/httpd/conf/httpd.conf
