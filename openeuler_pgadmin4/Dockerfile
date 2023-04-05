@@ -37,7 +37,7 @@ RUN /usr/bin/python3 -m venv /opt/pgadmin4/venv && \
     pip install -r /opt/pgadmin4/requirements.txt
 
 COPY ./pgAdmin4.conf /etc/httpd/conf/extra/pgAdmin4.conf
-
+RUN mkdir -p /var/lib/pgadmin
 COPY ./main.sh main.sh
 RUN chown -R www:www /opt/pgadmin4
 RUN yum clean all
