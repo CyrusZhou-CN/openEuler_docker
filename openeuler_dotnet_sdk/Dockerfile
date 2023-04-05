@@ -6,12 +6,12 @@ RUN  sed -i "s|http://repo.openeuler.org/|https://fr-repo.openeuler.org/|g" /etc
 WORKDIR /tmp
 RUN yum -y install tar nodejs libicu wget
 ARG DOTNET_ROOT=/usr/local/dotnet
-ARG DOTNET_SDK=dotnet-sdk-7.0.100-rc.2.22477.23-linux-x64.tar.gz
+ARG DOTNET_SDK=dotnet-sdk-7.0.202-linux-x64.tar.gz
 RUN mkdir -p ${DOTNET_ROOT}
 ENV DOTNET_ROOT=${DOTNET_ROOT}
 ENV PATH=$PATH:${DOTNET_ROOT}
 
-RUN wget https://download.visualstudio.microsoft.com/download/pr/f5c74056-330b-452b-915e-d98fda75024e/18076ca3b89cd362162bbd0cbf9b2ca5/dotnet-sdk-7.0.100-rc.2.22477.23-linux-x64.tar.gz
+RUN wget https://download.visualstudio.microsoft.com/download/pr/bda88810-e1a6-4cf0-8139-7fd7fe7b2c7a/7a9ffa3e12e5f1c3d8b640e326c1eb14/dotnet-sdk-7.0.202-linux-x64.tar.gz
 
 RUN tar vfx "${DOTNET_SDK}" -C "${DOTNET_ROOT}"
 RUN rm -Rf "${DOTNET_SDK}"
