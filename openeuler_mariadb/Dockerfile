@@ -1,11 +1,8 @@
-FROM openeuler/openeuler:22.09  AS base
-# 由于海外访问国内服务不稳定修改更新服务地址
-RUN  sed -i "s|http://repo.openeuler.org/|https://fr-repo.openeuler.org/|g" /etc/yum.repos.d/openEuler.repo
+FROM lsqtzj/openeuler:23.09  AS base
 
 WORKDIR /opt
 
-ARG MARIADB_MAJOR=10.9.3
-RUN yum update -y
+ARG MARIADB_MAJOR=11.3.0
 
 FROM base AS builder
 RUN yum -y install wget tar 

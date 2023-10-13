@@ -1,21 +1,20 @@
-FROM openeuler/openeuler:22.09 AS base
-RUN  sed -i "s|http://repo.openeuler.org/|https://fr-repo.openeuler.org/|g" /etc/yum.repos.d/openEuler.repo
+FROM lsqtzj/openeuler:23.09 AS base
+
 EXPOSE 80
 
 WORKDIR /opt
 
-RUN yum update -y
-
 FROM base AS builder
-COPY ./httpd-2.4.56.tar.bz2 httpd-2.4.56.tar.bz2
+
+ARG  HTTPD_VERSION=2.4.57
 RUN yum install -y wget apr-devel apr-util-devel pcre pcre-devel gcc make tar gcc-c++ lua-devel \
     openssl openssl-devel zlib unzip cmake ncurses-devel expat-devel libjpeg openldap-devel \
     libjpeg-devel libpng libxml2 libxml2-devel curl-devel libtool libtool-ltdl libtool-ltdl-devel \
     libevent libevent-devel zlib-static zlib-devel autoconf gd perl freetype freetype-devel \
     doxygen libuuid-devel python rpm-build libdb-devel mysql-devel nss-devel postgresql-devel sqlite-devel unixODBC-devel
 RUN yum clean all
-
-RUN rpmbuild -tb httpd-2.4.56.tar.bz2
+RUN wget  https://dlcdn.apache.org/httpd/httpd-${HTTPD_VERSION}.tar.bz2
+RUN rpmbuild -tb httpd-${HTTPD_VERSION}.tar.bz2
 
 
 FROM base AS runtime

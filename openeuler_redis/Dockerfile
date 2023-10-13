@@ -1,13 +1,10 @@
-FROM openeuler/openeuler:22.09  AS base
-# 由于海外访问国内服务不稳定修改更新服务地址
-RUN  sed -i "s|http://repo.openeuler.org/|https://fr-repo.openeuler.org/|g" /etc/yum.repos.d/openEuler.repo
-
+FROM lsqtzj/openeuler:23.09 AS base
 WORKDIR /opt
 
 FROM base AS builder
 RUN yum -y install wget tar make gcc gcc-c++
 
-ARG  REDIS_VERSION=7.0.5
+ARG  REDIS_VERSION=7.2.1
 RUN wget https://download.redis.io/releases/redis-${REDIS_VERSION}.tar.gz
 RUN tar -zvxf redis-${REDIS_VERSION}.tar.gz
 

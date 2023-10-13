@@ -1,4 +1,4 @@
-FROM openeuler/openeuler:22.09  AS base
+FROM lsqtzj/openeuler:23.09  AS base
 
 WORKDIR /opt
 
