@@ -1,1 +1,1 @@
-docker build -t lsqtzj/openeuler_mongodb .
+docker build -t lsqtzj/openeuler_mongodb:6.0.2 .
