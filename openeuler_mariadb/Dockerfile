@@ -2,7 +2,7 @@ FROM lsqtzj/openeuler:23.09  AS base
 
 WORKDIR /opt
 
-ARG MARIADB_MAJOR=10.9.8
+ARG MARIADB_MAJOR=10.10.6
 
 FROM base AS builder
 
@@ -19,14 +19,26 @@ RUN tar -zvxf pwgen-2.08.tar.gz && \
 
 RUN mkdir -p /var/lib/mysql
 RUN cd mariadb-${MARIADB_MAJOR} && \
-	cmake . -DDEFAULT_CHARSET=utf8 \
-	-DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+	cmake . \
+	-DCMAKE_INSTALL_PREFIX=/usr/local/mysql  \
 	-DMYSQL_DATADIR=/var/lib/mysql \
-	-DSYSCONFDIR=/etc -DWITHOUT_TOKUDB=1 \
-	-DMYSQL_UNIX_ADDR=/tmp/mysql.sock \
+	-DSYSCONFDIR=/etc \
+	-DMYSQL_USER=mysql \
+	-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+	-DWITH_ARCHIVE_STORAGE_ENGINE=1 \
+	-DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
+	-DWITH_PARTITION_STORAGE_ENGINE=1 \
+	-DWITHOUT_MROONGA_STORAGE_ENGINE=1 \
+	-DWITH_DEBUG=0 \
+	-DWITH_READLINE=1 \
 	-DCMAKE_BUILD_TYPE=Release \
-	-DDEFAULT_COLLATION=utf8_general_ci \
-	-DWITHOUT_WSREP=1 && \
+	-DWITH_SSL=system \
+	-DWITH_ZLIB=system \
+	-DWITH_LIBWRAP=0 \
+	-DENABLED_LOCAL_INFILE=1 \
+	-DMYSQL_UNIX_ADDR=/tmp/mysql.sock \
+	-DDEFAULT_CHARSET=utf8 \
+	-DDEFAULT_COLLATION=utf8_general_ci && \
 	make -j4 && make install
 
 FROM base AS runtime
