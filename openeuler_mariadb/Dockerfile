@@ -2,7 +2,7 @@ FROM lsqtzj/openeuler:23.09  AS base
 
 WORKDIR /opt
 
-ARG MARIADB_MAJOR=10.10.6
+ARG MARIADB_MAJOR=11.3.0
 
 FROM base AS builder
 
