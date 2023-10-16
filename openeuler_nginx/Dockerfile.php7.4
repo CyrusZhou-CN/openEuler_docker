@@ -1,69 +1,53 @@
-FROM openeuler/openeuler:20.09 AS base
+FROM lsqtzj/openeuler:23.09 AS base
 
 EXPOSE 80
 WORKDIR /opt
-# repo.openeuler.org 主机有点慢改成121.36.97.194 Beijing
-RUN sed -i 's/repo.openeuler.org/121.36.97.194/g' /etc/yum.repos.d/openEuler.repo
 RUN yum update -y
-RUN yum -y install shadow-utils libxslt libzip libcurl oniguruma && groupadd -r www && useradd -r -g www www
+RUN yum -y install shadow-utils libxslt libzip libcurl oniguruma re2c libmcrypt mhash && groupadd -r www && useradd -r -g www www
 
 FROM base AS builder
 
-RUN yum -y install wget tar make gcc autoconf systemd-devel openjpeg-devel gcc-c++ \
+RUN yum -y install wget tar make gcc autoconf systemd-devel openjpeg2-devel gcc-c++ \
         pcre-devel zlib-devel libxml2 libxml2-devel openssl openssl-devel bzip2 bzip2-devel \
         libcurl libcurl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel \
         gmp gmp-devel readline readline-devel libxslt libxslt-devel sqlite-devel bison \
         enchant automake libtool libedit libedit-devel oniguruma oniguruma-devel libzip libzip-devel \
-        enchant enchant-devel libicu libicu-devel libldb openldap openldap-devel libaio
+        enchant enchant-devel libicu libicu-devel libldb openldap openldap-devel libaio krb5-devel
 
-RUN wget https://nginx.org/download/nginx-1.21.6.tar.gz
-RUN wget https://github.com/php/php-src/archive/refs/tags/php-7.4.28.tar.gz
-RUN wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz
-RUN wget https://sourceforge.net/projects/mcrypt/files/Libmcrypt/2.5.8/libmcrypt-2.5.8.tar.gz
-RUN wget https://sourceforge.net/projects/mhash/files/latest/download/mhash-0.9.9.9.tar.gz
-RUN tar -zvxf nginx-1.21.6.tar.gz
-RUN tar -zvxf php-7.4.28.tar.gz
-RUN tar -zvxf libiconv-1.16.tar.gz
-RUN tar -zxvf libmcrypt-2.5.8.tar.gz
-RUN tar -zxvf mhash-0.9.9.9.tar.gz
+RUN wget https://www.openssl.org/source/openssl-1.1.1l.tar.gz && \
+    tar -xzvf openssl-1.1.1l.tar.gz && \
+    cd openssl-1.1.1l && ./config --prefix=/usr/local/openssl && make && make install
 
-RUN cd nginx-1.21.6 && ./configure --prefix=/usr/local/nginx  && make && make install
-RUN rm -Rf nginx-1.21.6 nginx-1.21.6.tar.gz
+RUN wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz
+RUN tar -zvxf libiconv-*.tar.gz && rm -Rf libiconv-*.tar.gz
+RUN cd libiconv-* && ./configure --prefix=/usr/local/libiconv && make -j4 && make install
 
-RUN cd libiconv-1.16 && ./configure --prefix=/usr/local/libiconv && make -j 2&& make install
-RUN cd libmcrypt-2.5.8 && ./configure && make && make install && ldconfig && cd libltdl/ && ./configure --enable-ltdl-install && make && make install
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH:/usr/local/libiconv/lib:/usr/local/openssl/lib
+RUN ldconfig
 
-RUN cd mhash-0.9.9.9 && ./configure && make -j 2 && make install
-RUN wget http://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/r/re2c-0.14.3-2.el7.x86_64.rpm && rpm -Uvh re2c-0.14.3-2.el7.x86_64.rpm
+RUN wget https://nginx.org/download/nginx-1.25.2.tar.gz
+RUN tar -zvxf nginx-*.tar.gz && rm -Rf nginx-*.tar.gz
+RUN cd nginx-* && ./configure --prefix=/usr/local/nginx  && make && make install
 
-RUN wget https://ftp.lysator.liu.se/pub/opensuse/distribution/leap/15.3/repo/oss/x86_64/libc-client2007e_suse-2007e_suse-bp153.1.86.x86_64.rpm && rpm -Uvh libc-client2007e_suse-2007e_suse-bp153.1.86.x86_64.rpm
-RUN wget https://ftp.lysator.liu.se/pub/opensuse/distribution/leap/15.3/repo/oss/x86_64/imap-devel-2007e_suse-bp153.1.86.x86_64.rpm && rpm -Uvh imap-devel-2007e_suse-bp153.1.86.x86_64.rpm
-
-RUN ln -s /usr/lib64/libc-client.so /usr/lib/libc-client.a
-RUN cp -frp /usr/lib64/libldap* /usr/lib/
-
-RUN cd /opt/php-src-php-7.4.28 && ./buildconf --force &&  \
+RUN wget https://github.com/php/php-src/archive/refs/tags/php-7.4.32.tar.gz
+RUN tar -zvxf php-*.tar.gz && rm -Rf php-*.tar.gz
+RUN cd /opt/php-src-php-* && ./buildconf --force &&  \
         ./configure \
         --prefix=/usr/local/php \
         --with-config-file-path=/usr/local/php/etc \
-        --with-iconv=/usr/local/libiconv \
+        --with-iconv-dir=/usr/local/libiconv \
+        --with-openssl-dir=/usr/local/openssl \
         --with-fpm-user=www \
         --with-fpm-group=www \
         --with-curl \
-        --with-freetype-dir \
         --enable-gd \
         --with-gettext \
         --with-kerberos \
-        #--with-libdir=lib64 \
-        --with-libxml-dir \
+        --with-libdir=lib64 \
         --with-mysqli \
-        --with-openssl \
-        --with-pcre-regex \
         --with-pdo-mysql \
         --with-pdo-sqlite \
         --with-pear \
-        --with-png-dir \
-        --with-jpeg-dir \
         --with-xmlrpc \
         --with-xsl \
         --with-zlib \
@@ -71,7 +55,6 @@ RUN cd /opt/php-src-php-7.4.28 && ./buildconf --force &&  \
         --with-mhash \
         --enable-fpm \
         --enable-bcmath \
-        --enable-libxml \
         --enable-inline-optimization \
         --enable-mbregex \
         --enable-mbstring \
@@ -83,10 +66,9 @@ RUN cd /opt/php-src-php-7.4.28 && ./buildconf --force &&  \
         --enable-sysvsem \
         --enable-sysvshm \
         --enable-xml \
-        --with-zip && make -j 4 ZEND_EXTRA_LIBS='-liconv' && make install
-
-RUN  set -e;\
-        cp /opt/php-src-php-7.4.28/php.ini-production /usr/local/php/etc/php.ini;\
+        --with-zip && make -j4 ZEND_EXTRA_LIBS='-liconv' && make install
+RUN cd /opt/php-src-php-* && cp php.ini-production /usr/local/php/etc/php.ini
+RUN  set -e;\        
         sed -i 's/post_max_size = 8M/post_max_size = 50M/g' /usr/local/php/etc/php.ini;\
         sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 50M/g' /usr/local/php/etc/php.ini;\
         sed -i 's/;date.timezone =/date.timezone = PRC/g' /usr/local/php/etc/php.ini;\
@@ -98,7 +80,6 @@ RUN  set -e;\
         sed -i 's/register_long_arrays = On/;register_long_arrays = On/g' /usr/local/php/etc/php.ini;\
         sed -i 's/magic_quotes_gpc = On/;magic_quotes_gpc = On/g' /usr/local/php/etc/php.ini;\
         sed -i 's/memory_limit = 128M/memory_limit = 512M/g' /usr/local/php/etc/php.ini;\
-        #sed -i 's/;extension=/extension=/g' /usr/local/php/etc/php.ini;\
         sed -i 's/disable_functions =.*/disable_functions = passthru,exec,system,chroot,chgrp,chown,shell_exec,proc_open,proc_get_status,ini_alter,ini_restore,dl,openlog,syslog,readlink,symlink,popepassthru,stream_socket_server/g' /usr/local/php/etc/php.ini;\
         ln -sf /usr/local/php/bin/php /usr/bin/php;\
         ln -sf /usr/local/php/bin/phpize /usr/bin/phpize;\
@@ -119,6 +100,7 @@ COPY  --from=builder /usr/local/php  /usr/local/php
 COPY  --from=builder /bin/phpenmod /bin/phpenmod
 # COPY  --from=builder /usr/local/zend /usr/local/zend
 COPY  --from=builder /usr/local/libiconv /usr/local/libiconv
+COPY  --from=builder /usr/local/openssl /usr/local/openssl
 COPY  ./php/php-fpm.conf  /usr/local/php/etc/php-fpm.conf
 
 RUN     ln -s /usr/local/php/bin/php /usr/bin/php;\
@@ -149,7 +131,7 @@ RUN mkdir -p /www/wwwroot/default && mkdir /www/wwwlogs && \
         echo '</style>';\
         echo '</head>';\
         echo '<body>';\
-        echo "<h1>openEuler"  && \   
+        echo '<h1><a href="https://www.openeuler.org/">openEuler</a>'  && \   
         cat /etc/os-release | grep -Po '(?<=VERSION=).*' | sed 's/"//g'| sed 's/$/<\/h1>/';\
         echo '<h1>Welcome to nginx!</h1>';\
         echo '<h2>';\
@@ -168,7 +150,7 @@ RUN mkdir -p /www/wwwroot/default && mkdir /www/wwwlogs && \
         echo '</body>';\
         echo '</html>';\
         } >> /www/wwwroot/default/index.php
-
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH:/usr/local/libiconv/lib:/usr/local/openssl/lib
 ENV PATH=$PATH:/usr/local/nginx/sbin/:/usr/local/php/sbin
 ENTRYPOINT [ "/opt/main.sh"]
 CMD ["/bin/bash"]
