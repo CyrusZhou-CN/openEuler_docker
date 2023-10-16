@@ -29,7 +29,7 @@ RUN wget https://nginx.org/download/nginx-1.25.2.tar.gz
 RUN tar -zvxf nginx-*.tar.gz && rm -Rf nginx-*.tar.gz
 RUN cd nginx-* && ./configure --prefix=/usr/local/nginx  && make && make install
 
-RUN wget https://github.com/php/php-src/archive/refs/tags/php-7.4.32.tar.gz
+RUN wget https://github.com/php/php-src/archive/refs/tags/php-8.2.11.tar.gz
 RUN tar -zvxf php-*.tar.gz && rm -Rf php-*.tar.gz
 RUN cd /opt/php-src-php-* && ./buildconf --force &&  \
         ./configure \
