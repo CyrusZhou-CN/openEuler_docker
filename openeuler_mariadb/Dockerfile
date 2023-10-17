@@ -18,12 +18,16 @@ RUN tar -zvxf pwgen-2.08.tar.gz && \
 	cd pwgen-2.08 && ./configure && make && make install
 
 RUN mkdir -p /var/lib/mysql
+
 RUN cd mariadb-${MARIADB_MAJOR} && \
-	cmake . \
-	-DCMAKE_INSTALL_PREFIX=/usr/local/mysql  \
+	cmake . -DDEFAULT_CHARSET=utf8 \
+	-DMYSQL_UNIX_ADDR=/tmp/mysql.sock \
+	-DDEFAULT_COLLATION=utf8_general_ci \
+	-DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
 	-DMYSQL_DATADIR=/var/lib/mysql \
 	-DSYSCONFDIR=/etc \
-	-DMYSQL_USER=mysql \
+	-DWITHOUT_TOKUDB=1 \
+	-DWITHOUT_WSREP=1 \
 	-DWITH_INNOBASE_STORAGE_ENGINE=1 \
 	-DWITH_ARCHIVE_STORAGE_ENGINE=1 \
 	-DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
@@ -35,10 +39,7 @@ RUN cd mariadb-${MARIADB_MAJOR} && \
 	-DWITH_SSL=system \
 	-DWITH_ZLIB=system \
 	-DWITH_LIBWRAP=0 \
-	-DENABLED_LOCAL_INFILE=1 \
-	-DMYSQL_UNIX_ADDR=/tmp/mysql.sock \
-	-DDEFAULT_CHARSET=utf8 \
-	-DDEFAULT_COLLATION=utf8_general_ci && \
+	-DENABLED_LOCAL_INFILE=1  && \
 	make -j4 && make install
 
 FROM base AS runtime
@@ -56,7 +57,7 @@ RUN mkdir -p /etc/mysql && \
 	cp /usr/local/mysql/support-files/wsrep.cnf  /etc/mysql/my.cnf
 # 默认忽略大小写
 RUN sed -i '/\[mysqld\]/alower_case_table_names=1' /etc/mysql/my.cnf
-
+RUN sed -i 's/wsrep_causal_reads=0/# wsrep_causal_reads=0/g' /etc/mysql/my.cnf
 EXPOSE 3306
 RUN mkdir /docker-entrypoint-initdb.d
 
@@ -64,7 +65,6 @@ VOLUME /var/lib/mysql
 ENV MARIADB_MAJOR $MARIADB_MAJOR
 ARG MARIADB_VERSION=1:${MARIADB_MAJOR}+maria~focal
 ENV MARIADB_VERSION $MARIADB_VERSION
-
 ENV PATH=$PATH:/usr/local/mysql/bin/
 COPY docker-entrypoint.sh /usr/local/bin/
 
