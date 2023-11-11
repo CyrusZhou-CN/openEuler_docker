@@ -76,6 +76,53 @@ RUN cd /opt/php-* && \
 
 RUN wget https://github.com/legale/phpenmod/raw/master/phpenmod -O /bin/phpenmod && chmod +x /bin/phpenmod
 RUN wget https://getcomposer.org/download/latest-stable/composer.phar
+# 编译扩展
+RUN cd /opt/php-*/ext/bcmath && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/bz2 && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/calendar && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/ctype && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/curl && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/dba && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/dom && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/enchant && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/exif && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/gettext && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/fileinfo && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/filter && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/ftp && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/gd && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/json && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/gmp && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/iconv && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/mbstring && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/mysqli && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/pdo && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/opcache && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/pcntl && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/pdo_mysql && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/pdo_sqlite && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/phar && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/posix && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/session && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/shmop && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/simplexml && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/soap && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/sockets && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/xml && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/sysvmsg && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/sysvsem && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/sysvshm && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/tokenizer && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/zip && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/xmlreader && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/xmlrpc && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/xmlwriter && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/xsl && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/zend_test && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/openssl && mv config0.m4 config.m4 && /usr/local/php/bin/phpize && CFLAGS="-I/usr/local/openssl/include" CPPFLAGS="-I/usr/local/openssl/include" ./configure --with-openssl=/usr/local/openssl --with-php-config=/usr/local/php/bin/php-config && make && make install
+RUN cd /opt/php-*/ext/sqlite3 && mv config0.m4 config.m4 && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
+COPY ./php/php-7.3.0/ext/intl /opt/php-7.3.0/ext/intl
+RUN cd /opt/php-*/ext/intl && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
 
 RUN sed -i '/<Directory "\/var\/www\/html">/a\    AddType application\/x-httpd-php .php' /etc/httpd/conf/httpd.conf
 RUN sed -i '/LoadModule rewrite_module lib64\/httpd\/modules\/mod_rewrite.so/a LoadModule php7_module lib64\/httpd\/modules\/libphp7.so' /etc/httpd/conf/httpd.conf
