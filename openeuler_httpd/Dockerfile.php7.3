@@ -136,20 +136,19 @@ RUN yum install -y aspell-devel
 RUN cd /opt/php-*/ext/pspell && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
 
 RUN sed -i '/<Directory "\/var\/www\/html">/a\    AddType application\/x-httpd-php .php' /etc/httpd/conf/httpd.conf
-RUN sed -i '/LoadModule rewrite_module lib64\/httpd\/modules\/mod_rewrite.so/a LoadModule php7_module lib64\/httpd\/modules\/libphp7.so' /etc/httpd/conf/httpd.conf
 RUN sed -i 's/DirectoryIndex index.html/DirectoryIndex index.php index.html/g' /etc/httpd/conf/httpd.conf
 COPY  ./php/php.ini /usr/local/php/etc/php.ini
 COPY  ./php/php-fpm.conf  /usr/local/php/etc/php-fpm.conf
 RUN mv composer.phar /usr/bin/composer
 
-# FROM base AS runtime
-# RUN yum -y install shadow-utils freetype libjpeg libpng libwebp libXpm libzip libicu
-# COPY --from=builder /usr/local/php  /usr/local/php
-# COPY --from=builder /usr/local/openssl /usr/local/openssl
-# COPY --from=builder /usr/local/libiconv /usr/local/libiconv
-# COPY --from=builder /usr/lib64/httpd /usr/lib64/httpd
-# COPY --from=builder /etc/httpd /etc/httpd
-# COPY --from=builder /usr/bin/composer /usr/bin/composer
+FROM base AS runtime
+RUN yum -y install shadow-utils freetype libjpeg libpng libwebp libXpm libzip libicu
+COPY --from=builder /usr/local/php  /usr/local/php
+COPY --from=builder /usr/local/openssl /usr/local/openssl
+COPY --from=builder /usr/local/libiconv /usr/local/libiconv
+COPY --from=builder /usr/lib64/httpd /usr/lib64/httpd
+COPY --from=builder /etc/httpd /etc/httpd
+COPY --from=builder /usr/bin/composer /usr/bin/composer
 
 RUN     ln -s /usr/local/php/bin/php /usr/bin/php;\
         ln -s /usr/local/php/bin/phpize /usr/bin/phpize;\
