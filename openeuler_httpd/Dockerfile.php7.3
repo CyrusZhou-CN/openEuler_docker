@@ -149,6 +149,7 @@ RUN chmod 755 /usr/local/php/etc/php-fpm.conf && chmod 755 /usr/local/php/etc/ph
 RUN chmod -R 777 /usr/bin/composer
 RUN composer config -g -- disable-tls true
 COPY ./php/auth.json /root/.config/composer/auth.json
+COPY ./php/auth.json /home/www/.config/composer/auth.json
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/libiconv/lib:/usr/local/openssl/lib
 ENV PATH=$PATH:/usr/local/openssl/bin/:/usr/local/php/sbin:/usr/local/php/bin:/usr/local/libiconv/bin
 
