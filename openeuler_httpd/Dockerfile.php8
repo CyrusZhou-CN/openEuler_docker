@@ -13,7 +13,8 @@ RUN yum -y install wget tar make gcc autoconf systemd-devel openjpeg2-devel gcc-
         libcurl libcurl-devel libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel \
         gmp gmp-devel readline readline-devel libxslt libxslt-devel sqlite-devel bison \
         enchant automake libtool libedit libedit-devel oniguruma oniguruma-devel libzip libzip-devel \
-        enchant enchant-devel libicu libicu-devel libldb openldap openldap-devel libaio krb5-devel
+        enchant enchant-devel libicu libicu-devel libldb openldap openldap-devel libaio krb5-devel \
+        freetds-devel libfbclient2-devel libsodium-devel net-snmp-devel aspell-devel gettext-devel rpm-build
 
 RUN wget https://www.openssl.org/source/openssl-1.1.1l.tar.gz && \
     tar -xzvf openssl-1.1.1l.tar.gz && \
@@ -21,7 +22,7 @@ RUN wget https://www.openssl.org/source/openssl-1.1.1l.tar.gz && \
 
 RUN wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz
 RUN tar -zvxf libiconv-*.tar.gz && rm -Rf libiconv-*.tar.gz
-RUN cd libiconv-* && ./configure --prefix=/usr/local/libiconv && make -j4 && make install
+RUN cd libiconv-* && ./configure --prefix=/usr/local/libiconv --enable-static --enable-dynamic && make -j4 && make install
 
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH:/usr/local/libiconv/lib:/usr/local/openssl/lib
 RUN ldconfig
@@ -32,32 +33,29 @@ RUN yum -y install mysql-devel
 RUN cd /opt/php-* && \
         ./configure \
         --prefix=/usr/local/php \
+        --with-libdir=lib64 \
         --with-config-file-path=/usr/local/php/etc \
         --with-iconv-dir=/usr/local/libiconv \
         --with-fpm-user=www \
         --with-fpm-group=www \
         --enable-fpm \
-        --enable-opcache=no \
         --with-pdo-mysql=mysqlnd \
         --with-curl	\
         --with-zlib \
-        --with-zlib-dir \
-        --with-libxml-dir \
-        --with-freetype-dir \
-        --with-jpeg-dir \
-        --with-png-dir \
+        --with-libxml \
+        --with-freetype \
+        --with-webp \
+        --with-jpeg \
+        --with-png \
         --with-curl \
         --with-gettext \
         --with-kerberos \
-        --with-libdir=lib64 \
         --with-mysqli \
         --with-pdo-mysql \
         --with-pdo-sqlite \
         --with-pear \
         --with-xmlrpc \
         --with-xsl \
-        --with-zlib \
-        --with-zlib-dir \
         --with-bz2 \
         --with-mhash \
         --enable-bcmath \
@@ -65,6 +63,7 @@ RUN cd /opt/php-* && \
         --enable-mbregex \
         --enable-mbstring \
         --enable-opcache \
+        --enable-apcu \
         --enable-pcntl \
         --enable-shmop \
         --enable-soap \
@@ -124,44 +123,16 @@ RUN cd /opt/php-*/ext/dl_test && /usr/local/php/bin/phpize && ./configure --with
 RUN cd /opt/php-*/ext/ffi && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
 RUN cd /opt/php-*/ext/ldap && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config --with-libdir=lib64 && make && make install
 RUN cd /opt/php-*/ext/mysqlnd && mv config9.m4 config.m4 && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-RUN yum install -y freetds-devel
 RUN cd /opt/php-*/ext/pdo_dblib && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-RUN yum install -y libfbclient2-devel
 RUN cd /opt/php-*/ext/pdo_firebird && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-RUN yum install -y libsodium-devel
 RUN cd /opt/php-*/ext/sodium && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-RUN yum install -y net-snmp-devel
 RUN cd /opt/php-*/ext/snmp && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
 RUN cd /opt/php-*/ext/readline && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-RUN yum install -y aspell-devel
 RUN cd /opt/php-*/ext/pspell && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
 
-# RUN cd /opt/php-*/ext/odbc && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/libxml && mv config0.m4 config.m4&& /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/com_dotnet && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/date && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/hash && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/imap && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/json && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/oci8 && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/pcre && mv config0.m4 config.m4 && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/zlib && mv config0.m4 config.m4 && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN yum install -y libtidy-devel
-# RUN cd /opt/php-*/ext/tidy && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN yum install -y libargon2-devel
-# RUN cd /opt/php-*/ext/standard && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config --with-password-argon2 && make && make install
-# RUN cd /opt/php-*/ext/pdo_oci && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/pdo_odbc && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/pdo_pgsql && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/pgsql && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/reflection && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/skeleton && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-# RUN cd /opt/php-*/ext/spl && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config && make && make install
-
 RUN sed -i '/<Directory "\/var\/www\/html">/a\    AddType application\/x-httpd-php .php' /etc/httpd/conf/httpd.conf
-RUN sed -i '/LoadModule rewrite_module lib64\/httpd\/modules\/mod_rewrite.so/a LoadModule php_module lib64\/httpd\/modules\/libphp.so' /etc/httpd/conf/httpd.conf
 RUN sed -i 's/DirectoryIndex index.html/DirectoryIndex index.php index.html/g' /etc/httpd/conf/httpd.conf
-COPY ./php/php.ini /usr/local/php/etc/php.ini
+COPY  ./php/php.ini /usr/local/php/etc/php.ini
 COPY ./php/php-fpm.conf  /usr/local/php/etc/php-fpm.conf
 RUN mv composer.phar /usr/bin/composer
 

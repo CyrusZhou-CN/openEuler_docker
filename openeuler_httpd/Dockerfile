@@ -26,6 +26,7 @@ RUN sed -i "/^User daemon/c\User www"  /etc/httpd/conf/httpd.conf
 RUN sed -i "/^Group daemon/c\Group www"  /etc/httpd/conf/httpd.conf
 RUN sed -i "/^#ServerName/c\ServerName localhost:80" /etc/httpd/conf/httpd.conf
 RUN sed -i "/^#LoadModule rewrite_module/c\LoadModule rewrite_module lib64/httpd/modules/mod_rewrite.so" /etc/httpd/conf/httpd.conf
+RUN sed -i '/<Directory "\/var\/www\/html">/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/httpd/conf/httpd.conf
 RUN echo "<html><body>" > /var/www/html/index.html && \
     echo "<h1>openEuler" >> /var/www/html/index.html && \
     cat /etc/os-release | grep -Po '(?<=VERSION=).*' | sed 's/"//g'| sed 's/$/<\/h1>/' >> /var/www/html/index.html && \
